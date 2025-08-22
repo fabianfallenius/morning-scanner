@@ -25,6 +25,7 @@ from common.logging_setup import setup_logging
 from common.utils_time import now_se
 from sources.mfn import MFNScraper
 from sources.di_morgonkoll import DIMorgonkollScraper
+from sources.di_main import DIMainScraper
 from sources.extras import ExtraSourcesScraper
 from mapping.map_company import CompanyMapper
 from nlp.classify import get_news_classifier
@@ -60,6 +61,7 @@ class MorningScanner:
         self.news_sources = [
             MFNScraper(),
             DIMorgonkollScraper(),
+            DIMainScraper(),
             ExtraSourcesScraper()
         ]
         

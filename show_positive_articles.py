@@ -17,6 +17,7 @@ async def analyze_todays_news():
     """Analyze today's news and show positive articles."""
     try:
         from sources.di_morgonkoll import DIMorgonkollScraper
+        from sources.di_main import DIMainScraper
         from sources.extras import ExtraSourcesScraper
         from nlp.classify import get_news_classifier
         from output.sender_email import get_email_sender
@@ -43,6 +44,15 @@ async def analyze_todays_news():
         finally:
             await di_scraper.close()
         
+        # Collect from DI Main Website
+        print("🔍 Scanning DI Main Website...")
+        di_main_scraper = DIMainScraper()
+        try:
+            di_main_news = await di_main_scraper.scrape_news()
+            print(f"   ✅ Found {len(di_main_news)} articles from DI Main Website")
+        finally:
+            await di_main_scraper.close()
+        
         # Collect from Extra Sources (RSS feeds)
         print("🔍 Scanning RSS Feeds (SVT, DN, etc.)...")
         extra_scraper = ExtraSourcesScraper()
@@ -53,7 +63,7 @@ async def analyze_todays_news():
             await extra_scraper.close()
         
         # Combine all news
-        all_news = di_news + rss_news
+        all_news = di_news + di_main_news + rss_news
         
         print(f"\n📊 Total Articles Collected: {len(all_news)}")
         print("\n🔬 Analyzing Articles with Swedish Financial Keywords...")
