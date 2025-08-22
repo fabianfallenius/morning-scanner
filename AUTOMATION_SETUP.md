@@ -1,11 +1,11 @@
 # 🚀 Morning Scanner Automation Setup
 
-This guide shows you how to make your Morning Scanner run automatically at 08:40 every morning, even when your computer is off!
+This guide shows you how to make your Morning Scanner run automatically at 08:30 every morning, even when your computer is off!
 
 ## 🌟 **Option 1: GitHub Actions (Recommended - FREE)**
 
 ### **What It Does:**
-- Runs your Morning Scanner in the cloud every day at 08:40 Stockholm time
+- Runs your Morning Scanner in the cloud every day at 08:30 Stockholm time
 - Sends email reports even when your computer is off
 - Completely free for personal use
 - Reliable and professional-grade
@@ -99,7 +99,7 @@ git push heroku main
 1. Go to Heroku Dashboard
 2. Click **Resources** → **Scheduler**
 3. Add job: `python main.py`
-4. Set frequency: **Daily at 08:40**
+4. Set frequency: **Daily at 08:30**
 
 ---
 
@@ -214,7 +214,7 @@ sudo launchctl start com.morningscanner
 1. **Push your code to GitHub** (5 minutes)
 2. **Add the 3 secrets** (5 minutes)  
 3. **Test the workflow** (5 minutes)
-4. **Enjoy daily emails at 08:40!** 🎉
+4. **Enjoy daily emails at 08:30!** 🎉
 
 ### **Next Steps:**
 1. Choose your preferred option
@@ -227,7 +227,7 @@ sudo launchctl start com.morningscanner
 
 ## 📧 **What You'll Get:**
 
-Every morning at 08:40, you'll receive an email with:
+Every morning at 08:30, you'll receive an email with:
 - 📰 Top Swedish financial news
 - 📊 Relevance scores and analysis
 - 🔍 Positive stock opportunities

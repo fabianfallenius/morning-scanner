@@ -7,7 +7,7 @@
 ```
 Your Computer (Local)     ←→     GitHub (Cloud)
      ↓                              ↓
-  Edit Code                    Runs at 08:40
+  Edit Code                    Runs at 08:30
      ↓                              ↓
   Save Files                   Uses Latest Code
      ↓                              ↓
@@ -19,7 +19,7 @@ Your Computer (Local)     ←→     GitHub (Cloud)
 ### **⏰ Timing:**
 - **Local Changes**: Made anytime on your computer
 - **GitHub Sync**: When you run the sync script
-- **Automatic Runs**: Every morning at 08:40 Stockholm time
+- **Automatic Runs**: Every morning at 08:30 Stockholm time
 - **Email Reports**: Based on the latest code on GitHub
 
 ---
@@ -60,7 +60,7 @@ $ python3 sync_to_github.py
 ✅ Pushing to GitHub successful
 
 🎉 SUCCESS! Your code is now synced to GitHub.
-📅 The next automatic run at 08:40 will use your updated code!
+📅 The next automatic run at 08:30 will use your updated code!
 ```
 
 ---
@@ -104,7 +104,7 @@ git push origin main
 - **Immediate**: After important changes
 - **Daily**: Before going to bed
 - **Weekly**: Regular maintenance
-- **Before 08:40**: To ensure latest code runs
+- **Before 08:30**: To ensure latest code runs
 
 ---
 
@@ -133,7 +133,7 @@ git log --oneline -5
 # Sync to GitHub
 python3 sync_to_github.py
 
-# Next 08:40 run will use your changes!
+# Next 08:30 run will use your changes!
 ```
 
 ### **Scenario 2: No Changes Made**
@@ -195,18 +195,18 @@ git push origin main
 1. **Edit Code** → Make changes on your computer
 2. **Run Sync** → `python3 sync_to_github.py`
 3. **Code Pushed** → Changes go to GitHub
-4. **Automatic Run** → Next 08:40 uses updated code
+4. **Automatic Run** → Next 08:30 uses updated code
 5. **Email Report** → You get results from latest version
 
 ### **Key Points:**
 - **Local changes don't auto-sync** - you must push them
 - **Sync script makes it easy** - just one command
 - **GitHub Actions always uses latest code** - after you sync
-- **Timing matters** - sync before 08:40 for same-day updates
+- **Timing matters** - sync before 08:30 for same-day updates
 
 ### **Your Workflow:**
 ```
-Edit Code → Save → Run Sync → Push to GitHub → Automatic 08:40 Run → Email Report
+Edit Code → Save → Run Sync → Push to GitHub → Automatic 08:30 Run → Email Report
 ```
 
 **Your Morning Scanner will always use the latest code after you sync!** 🚀📈 

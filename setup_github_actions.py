@@ -66,9 +66,9 @@ def create_github_workflow():
 
 on:
   schedule:
-    # Run at 08:40 Stockholm time (07:40 UTC in winter, 06:40 UTC in summer)
-    - cron: '40 7 * * *'  # 07:40 UTC = 08:40 Stockholm (winter)
-    - cron: '40 6 * * *'  # 06:40 UTC = 08:40 Stockholm (summer)
+                    # Run at 08:30 Stockholm time (07:30 UTC in winter, 06:30 UTC in summer)
+                - cron: '30 7 * * *'  # 07:30 UTC = 08:30 Stockholm (winter)
+                - cron: '30 6 * * *'  # 06:30 UTC = 08:30 Stockholm (summer)
   
   # Allow manual triggering
   workflow_dispatch:
@@ -95,7 +95,7 @@ jobs:
       run: |
         echo "TZ=Europe/Stockholm" >> .env
         echo "RUN_HOUR=8" >> .env
-        echo "RUN_MINUTE=40" >> .env
+        echo "RUN_MINUTE=30" >> .env
         echo "EMAIL_ENABLED=true" >> .env
         echo "TELEGRAM_ENABLED=false" >> .env
         echo "SMTP_HOST=smtp.gmail.com" >> .env
