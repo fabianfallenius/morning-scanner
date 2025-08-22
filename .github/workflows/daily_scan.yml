@@ -3,7 +3,6 @@ name: Daily Morning Scanner
 on:
   schedule:
     # Run at 08:40 Stockholm time (07:40 UTC in winter, 06:40 UTC in summer)
-    # Using UTC time for consistency
     - cron: '40 7 * * *'  # 07:40 UTC = 08:40 Stockholm (winter)
     - cron: '40 6 * * *'  # 06:40 UTC = 08:40 Stockholm (summer)
   
@@ -58,4 +57,4 @@ jobs:
         path: |
           storage/errors.log
           storage/picks_log.csv
-        retention-days: 7 
+        retention-days: 7
