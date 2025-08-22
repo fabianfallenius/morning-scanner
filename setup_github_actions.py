@@ -114,7 +114,7 @@ jobs:
         EMAIL_TO: ${{ secrets.EMAIL_TO }}
     
     - name: Upload logs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: morning-scanner-logs
