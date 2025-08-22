@@ -84,12 +84,12 @@ def test_send_email():
             classified_news.append(item)
         
         # Generate insights
-        insights = news_classifier.get_news_insights(classified_news)
+        insights = news_classifier.get_enhanced_insights(classified_news)
         
         print(f"📊 Market Insights Generated:")
         print(f"   - Total Items: {insights['total_items']}")
-        print(f"   - High Impact: {insights['impact_distribution']['high']}")
-        print(f"   - Catalyst Events: {insights['catalyst_events']}")
+        print(f"   - High Impact: {insights.get("strong_opportunities", 0)}")
+        print(f"   - Catalyst Events: {insights.get("advanced_signals_detected", 0)}")
         print(f"   - Market Sentiment: {insights['insights']}")
         
         # Send the email
@@ -103,7 +103,7 @@ def test_send_email():
             print(f"")
             print(f"The email contains:")
             print(f"   📈 {len([item for item in classified_news if item['classification'].relevance_score >= 0.4])} positive stock opportunities")
-            print(f"   ⚡ {insights['catalyst_events']} catalyst events")
+            print(f"   ⚡ {insights.get("advanced_signals_detected", 0)} catalyst events")
             print(f"   🎯 Relevance-ranked articles with explanations")
             print(f"   📊 Market summary and insights")
             return True

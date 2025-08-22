@@ -110,6 +110,32 @@ class SwedishFinancialKeywords:
             'real_estate': ['fastighet', 'byggande', 'infrastruktur', 'logistik', 'kontor', 'bostäder', 'hyresfastighet', 'utveckling']
         }
         
+        # Swedish companies (major stocks)
+        self.SWEDISH_COMPANIES = [
+            'ericsson', 'volvo', 'atlas copco', 'seb', 'handelsbanken', 'nordea',
+            'ssab', 'sandvik', 'skf', 'hexagon', 'getinge', 'essity', 'hemtex',
+            'clas ohlson', 'bilia', 'volvo cars', 'kinnevik', 'investor',
+            'astrazeneca', 'ericsson b', 'volvo b', 'atlas copco b', 'seb a',
+            'handelsbanken a', 'nordea bank', 'ssab a', 'sandvik a', 'skf b',
+            'hexagon b', 'getinge b', 'essity b', 'hemtex b', 'clas ohlson b',
+            'bilia b', 'kinnevik b', 'investor b',
+        ]
+        
+        # Swedish financial terms
+        self.SWEDISH_FINANCIAL_TERMS = [
+            'omx', 'stockholm', 'börs', 'aktie', 'aktier', 'utdelning', 'vinst',
+            'tillväxt', 'omsättning', 'resultat', 'rapport', 'bokslut',
+            'omx30', 'omx stockholm', 'stockholm börs', 'aktiebolag', 'utdelning',
+            'vinstökning', 'tillväxt', 'omsättningsökning', 'resultatförbättring',
+        ]
+        
+        # Swedish business terms
+        self.SWEDISH_BUSINESS_TERMS = [
+            'företag', 'bolag', 'koncern', 'fusion', 'uppköp', 'strategi',
+            'investering', 'expansion', 'marknad', 'konkurrens', 'affärsområde',
+            'affärsstrategi', 'affärsmodell', 'affärsutveckling', 'affärspartnerskap',
+        ]
+        
         # Create regex patterns for faster matching
         self._compile_patterns()
         

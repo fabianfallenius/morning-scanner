@@ -77,15 +77,15 @@ async def analyze_todays_news():
                 article['classification'] = classification
                 classified_news.append(article)
                 
-                # Check if it's positive
+                # Filter for positive articles with lower threshold
                 relevance_score = classification.relevance_score
                 sentiment_score = classification.sentiment_score
                 impact_level = classification.impact_level
                 has_catalyst = classification.has_catalyst
                 
-                # Filter for positive opportunities
-                if (relevance_score >= 0.3 and 
-                    (sentiment_score > 0.05 or has_catalyst or impact_level in ['high', 'medium'])):
+                # Lower threshold from 0.3 to 0.2, and be more inclusive
+                if (relevance_score >= 0.2 and  # Lowered from 0.3
+                    (sentiment_score > 0.0 or has_catalyst or impact_level in ['high', 'medium', 'low'])):
                     positive_articles.append(article)
                 
                 print(f"   📄 {i:2d}. {title[:60]}{'...' if len(title) > 60 else ''}")
@@ -96,15 +96,15 @@ async def analyze_todays_news():
                 continue
         
         # Generate insights
-        insights = news_classifier.get_news_insights(classified_news)
+        insights = news_classifier.get_enhanced_insights(classified_news)
         
         print(f"\n📈 Market Analysis Summary:")
         print("-" * 40)
         print(f"📰 Total Articles Analyzed: {insights['total_items']}")
         print(f"🚀 Positive Opportunities: {len(positive_articles)}")
-        print(f"⚡ Catalyst Events: {insights['catalyst_events']}")
-        print(f"📊 High Impact News: {insights['impact_distribution']['high']}")
-        print(f"📊 Medium Impact News: {insights['impact_distribution']['medium']}")
+        print(f"⚡ Catalyst Events: {insights.get("advanced_signals_detected", 0)}")
+        print(f"📊 High Impact News: {insights.get("strong_opportunities", 0)}")
+        print(f"📊 Medium Impact News: {insights.get("strong_opportunities", 0)}")
         print(f"📊 Market Sentiment: {insights['insights']}")
         
         if positive_articles:

@@ -216,6 +216,8 @@ class EmailSender:
                 .news-title {{ color: #2c3e50; font-size: 18px; font-weight: bold; margin-bottom: 10px; }}
                 .news-snippet {{ color: #555; margin-bottom: 15px; }}
                 .news-meta {{ color: #888; font-size: 14px; }}
+                .news-url {{ background: #007bff; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; display: inline-block; margin: 10px 0; font-weight: bold; }}
+                .news-url:hover {{ background: #0056b3; }}
                 .positive-badge {{ background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; }}
                 .catalyst-badge {{ background: #ffc107; color: #212529; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; }}
                 .high-impact-badge {{ background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px; }}
@@ -269,6 +271,9 @@ class EmailSender:
                     <div class="news-meta">
                         <strong>Why this is good:</strong> {self._explain_why_good(classification)}<br>
                         <strong>Source:</strong> {source} | <strong>Time:</strong> {timestamp}
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <a href="{url}" class="news-url" target="_blank">📖 READ FULL ARTICLE</a>
                     </div>
                 </div>
                 """
@@ -337,7 +342,8 @@ POSITIVE STOCK OPPORTUNITIES:
 
    Why this is good: {self._explain_why_good(classification)}
    Source: {source} | Time: {timestamp}
-   URL: {url}
+   
+   🔗 READ FULL ARTICLE: {url}
 
 {'-' * 60}
 """

@@ -126,44 +126,67 @@ class NewsClassifier:
             logger.error(f"Error classifying news: {e}")
             return self._create_empty_enhanced_classification()
     
-    def _calculate_relevance_score(self, positive_keywords: List[KeywordMatch], 
-                                 negative_keywords: List[KeywordMatch],
-                                 catalyst_keywords: List[KeywordMatch],
-                                 advanced_signals: List[AdvancedSignal]) -> float:
-        """Enhanced relevance calculation including advanced signals."""
-        
-        # Basic keyword relevance (40% weight)
-        keyword_relevance = self.keyword_analyzer.calculate_relevance_score(
-            positive_keywords, negative_keywords, catalyst_keywords
-        ) * 0.4
-        
-        # Advanced signals relevance (60% weight)
-        signal_relevance = 0.0
-        if advanced_signals:
-            # Weight different signal types
-            signal_weights = {
-                'quantitative': 0.3,
-                'timing': 0.25,
-                'competitive': 0.2,
-                'management': 0.15,
-                'tailwind': 0.05,
-                'value': 0.05
-            }
+    def _calculate_relevance_score(self, positive_keywords: List[KeywordMatch],
+                                  negative_keywords: List[KeywordMatch],
+                                  catalyst_keywords: List[KeywordMatch],
+                                  advanced_signals: List[AdvancedSignal]) -> float:
+        """Calculate enhanced relevance score with Swedish content bonuses."""
+        try:
+            # Base score from keywords
+            total_keywords = len(positive_keywords) + len(negative_keywords) + len(catalyst_keywords)
+            total_score = (sum(match.score for match in positive_keywords) + 
+                        sum(match.score for match in negative_keywords) +
+                        sum(match.score for match in catalyst_keywords))
             
-            weighted_score = 0.0
-            total_weight = 0.0
+            if total_keywords == 0:
+                return 0.0
             
-            for signal in advanced_signals:
-                if signal.strength > 0:  # Ignore negative signals for relevance
-                    signal_category = signal.signal_type.split('_')[0]
-                    weight = signal_weights.get(signal_category, 0.1)
-                    weighted_score += signal.strength * weight * signal.confidence
-                    total_weight += weight * signal.confidence
+            # Calculate base relevance
+            avg_strength = total_score / total_keywords
+            quantity_bonus = min(0.3, total_keywords * 0.05)
+            catalyst_bonus = min(0.2, len(catalyst_keywords) * 0.1)
             
-            if total_weight > 0:
-                signal_relevance = (weighted_score / total_weight) * 0.6
-        
-        return min(1.0, keyword_relevance + signal_relevance)
+            base_score = min(1.0, avg_strength + quantity_bonus + catalyst_bonus)
+            
+            # Swedish content bonuses
+            swedish_bonus = 0.0
+            if positive_keywords or catalyst_keywords:
+                # Check for Swedish company names
+                swedish_companies = ['ericsson', 'volvo', 'atlas copco', 'seb', 'handelsbanken', 
+                                   'nordea', 'ssab', 'sandvik', 'skf', 'hexagon', 'getinge']
+                
+                for keyword_match in positive_keywords + catalyst_keywords:
+                    if any(company in keyword_match.keyword.lower() for company in swedish_companies):
+                        swedish_bonus += 0.15  # Bonus for Swedish companies
+                        break
+                
+                # Check for Swedish financial terms
+                swedish_terms = ['omx', 'börs', 'aktie', 'vinst', 'tillväxt', 'omsättning', 
+                               'resultat', 'rapport', 'bokslut', 'utdelning']
+                
+                for keyword_match in positive_keywords + catalyst_keywords:
+                    if any(term in keyword_match.keyword.lower() for term in swedish_terms):
+                        swedish_bonus += 0.1  # Bonus for Swedish financial terms
+                        break
+            
+            # Advanced signals bonus
+            advanced_bonus = 0.0
+            if advanced_signals:
+                signal_strength = sum(signal.strength for signal in advanced_signals)
+                advanced_bonus = min(0.2, signal_strength * 0.1)
+            
+            # Calculate final score with bonuses
+            final_score = min(1.0, base_score + swedish_bonus + advanced_bonus)
+            
+            # Ensure minimum relevance for articles with Swedish content
+            if swedish_bonus > 0:
+                final_score = max(final_score, 0.25)  # Minimum 0.25 for Swedish content
+            
+            return final_score
+            
+        except Exception as e:
+            logger.error(f"Error calculating relevance score: {e}")
+            return 0.0
     
     def _determine_enhanced_impact_level(self, relevance_score: float, sentiment_score: float,
                                        catalyst_keywords: List[KeywordMatch],
