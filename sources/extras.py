@@ -21,35 +21,25 @@ class ExtraSourcesScraper:
         self.ssl_config = get_ssl_config()
         self.session = None
         
-        # RSS feeds to monitor
+        # RSS feeds to monitor - ONLY WORKING FEEDS
         self.rss_feeds = {
+            # Swedish Financial News (Working)
             'SVT Ekonomi': 'https://www.svt.se/nyheter/rss.xml',
             'DN Ekonomi': 'https://www.dn.se/rss/ekonomi/',
             'SVT Näringsliv': 'https://www.svt.se/nyheter/rss.xml?section=naringsliv',
             'Aftonbladet Ekonomi': 'https://www.aftonbladet.se/ekonomi/rss.xml',
             
-            # Working Swedish financial news:
-            'Sveriges Radio Ekonomi': 'https://sverigesradio.se/api/rss/program/83',
-            'Expressen Ekonomi': 'https://www.expressen.se/ekonomi/rss.xml',
+            # Swedish News Sections (Working)
             'SVT Sport': 'https://www.svt.se/nyheter/rss.xml?section=sport',
             'SVT Kultur': 'https://www.svt.se/nyheter/rss.xml?section=kultur',
             
-            # International financial news:
-            'Reuters Business': 'https://feeds.reuters.com/reuters/businessNews',
+            # International Financial News (Working)
             'Bloomberg Markets': 'https://feeds.bloomberg.com/markets/news.rss',
-            'Financial Times': 'https://www.ft.com/rss/home',
-            
-            # Swedish company news:
-            'Ericsson Investor': 'https://www.ericsson.com/en/investors/financial-reports',
-            'Volvo Cars': 'https://www.volvocars.com/intl/news',
-            'SEB Group': 'https://sebgroup.com/press-and-news'
+            'Financial Times': 'https://www.ft.com/rss/home'
         }
         
-        # API endpoints (placeholder for future use)
-        self.api_endpoints = {
-            'Riksbanken': 'https://www.riksbank.se/sv/nyheter-och-press/nyheter/',
-            'Finansinspektionen': 'https://www.fi.se/sv/nyheter/'
-        }
+        # API endpoints - REMOVED (all were failing)
+        self.api_endpoints = {}
         
         logger.info(f"Extra sources scraper initialized with {len(self.rss_feeds)} RSS feeds")
     
