@@ -105,6 +105,11 @@ class ExtraSourcesScraper:
                             if not description:
                                 description = entry.get('summary', '')
                             
+                            # Extract content if available (some RSS feeds include full content)
+                            content = entry.get('content', [{}])[0].get('value', '') if entry.get('content') else ''
+                            if not content:
+                                content = entry.get('encoded', '')  # Try encoded content
+                            
                             # Extract timestamp
                             timestamp = None
                             if hasattr(entry, 'published_parsed') and entry.published_parsed:
@@ -117,13 +122,22 @@ class ExtraSourcesScraper:
                             # Extract author if available
                             author = entry.get('author', '')
                             
+                            # Extract categories/tags if available
+                            categories = []
+                            if hasattr(entry, 'tags'):
+                                categories = [tag.term for tag in entry.tags if hasattr(tag, 'term')]
+                            elif hasattr(entry, 'category'):
+                                categories = [entry.category]
+                            
                             news_items.append({
                                 'title': title,
                                 'url': link,
                                 'snippet': description,
+                                'content': content,  # Add full content when available
                                 'timestamp': timestamp,
                                 'source': name,
                                 'author': author,
+                                'categories': categories,
                                 'feed_type': 'rss'
                             })
                             
@@ -211,6 +225,58 @@ class ExtraSourcesScraper:
             logger.error(f"Error fetching API content {name}: {e}")
             return []
     
+    async def _fetch_article_content(self, url: str, timeout: int = 10) -> str:
+        """Fetch full article content from a URL."""
+        try:
+            session = await self._create_session()
+            logger.debug(f"Fetching article content: {url}")
+            
+            async with session.get(url, timeout=timeout) as response:
+                if response.status == 200:
+                    content = await response.text()
+                    
+                    # Parse HTML and extract main content
+                    soup = BeautifulSoup(content, 'html.parser')
+                    
+                    # Remove unwanted elements
+                    for element in soup(['script', 'style', 'nav', 'header', 'footer', 'aside']):
+                        element.decompose()
+                    
+                    # Try to find main article content
+                    content_selectors = [
+                        'article', '.article-content', '.post-content', '.entry-content',
+                        '.news-content', '.story-content', '.content', 'main',
+                        '[class*="content"]', '[class*="article"]', '[class*="post"]'
+                    ]
+                    
+                    article_content = ""
+                    for selector in content_selectors:
+                        content_elem = soup.select_one(selector)
+                        if content_elem:
+                            # Get all text from paragraphs
+                            paragraphs = content_elem.find_all('p')
+                            if paragraphs:
+                                article_content = ' '.join([p.get_text(strip=True) for p in paragraphs])
+                                break
+                    
+                    # If no specific content found, get all paragraph text
+                    if not article_content:
+                        paragraphs = soup.find_all('p')
+                        article_content = ' '.join([p.get_text(strip=True) for p in paragraphs])
+                    
+                    # Clean and limit content length
+                    article_content = ' '.join(article_content.split())[:2000]  # Limit to ~2000 chars
+                    
+                    return article_content
+                    
+                else:
+                    logger.debug(f"Failed to fetch article content from {url}: {response.status}")
+                    return ""
+                    
+        except Exception as e:
+            logger.debug(f"Error fetching article content from {url}: {e}")
+            return ""
+    
     async def _deduplicate_news(self, all_news: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Remove duplicate news items across all sources."""
         if not all_news:
@@ -240,22 +306,27 @@ class ExtraSourcesScraper:
         return unique_items
     
     async def scrape_news(self) -> List[Dict[str, Any]]:
-        """Scrape news from all extra sources."""
-        logger.info("Starting extra sources scraping")
-        
+        """Scrape news from all configured sources."""
         all_news = []
         
-        # Scrape RSS feeds
+        # Fetch from RSS feeds
         for name, url in self.rss_feeds.items():
             try:
                 news_items = await self._fetch_rss_feed(name, url)
+                
+                # Enhance with article content for high-priority feeds
+                if name in ['SVT Ekonomi', 'DN Ekonomi', 'SVT Näringsliv']:
+                    for item in news_items[:5]:  # Limit content fetching to first 5 articles
+                        if item.get('url'):
+                            article_content = await self._fetch_article_content(item['url'])
+                            if article_content:
+                                item['content'] = article_content
+                                logger.debug(f"Enhanced {name} article with content ({len(article_content)} chars)")
+                
                 all_news.extend(news_items)
                 
-                # Be respectful - small delay between requests
-                await asyncio.sleep(1)
-                
             except Exception as e:
-                logger.error(f"Error scraping RSS feed {name}: {e}")
+                logger.error(f"Error scraping {name}: {e}")
                 continue
         
         # Scrape API endpoints (placeholder)

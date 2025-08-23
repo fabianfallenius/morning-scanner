@@ -181,9 +181,9 @@ class MorningScanner:
                 # Extract text for classification
                 title = item.get('title', '')
                 snippet = item.get('snippet', '')
-                content = item.get('content', '')
+                content = item.get('content', '')  # Now includes full article content
                 
-                # Classify the news
+                # Classify the news with full content
                 classification = self.news_classifier.classify_news(title, content, snippet)
                 
                 # Add classification to item
