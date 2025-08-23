@@ -2,9 +2,13 @@ name: Daily Morning Scanner
 
 on:
   schedule:
-    # Run at 08:30 Stockholm time (07:30 UTC in winter, 06:30 UTC in summer)
-    - cron: '30 7 * * *'  # 07:30 UTC = 08:30 Stockholm (winter)
-    - cron: '30 6 * * *'  # 06:30 UTC = 08:30 Stockholm (summer)
+    # Run at 08:30 Stockholm time (CET/CEST)
+    # GitHub Actions runs on UTC, so we need to account for timezone
+    - cron: '30 6 * * *'  # 06:30 UTC = 08:30 Stockholm (summer CEST)
+    - cron: '30 7 * * *'  # 07:30 UTC = 08:30 Stockholm (winter CET)
+    # Backup times to ensure reliability
+    - cron: '25 6 * * *'  # 06:25 UTC = 08:25 Stockholm (5 min early backup)
+    - cron: '35 6 * * *'  # 06:35 UTC = 08:35 Stockholm (5 min late backup)
   
   # Allow manual triggering
   workflow_dispatch:
@@ -40,6 +44,16 @@ jobs:
         echo "SMTP_PASS=${{ secrets.SMTP_PASS }}" >> .env
         echo "EMAIL_TO=${{ secrets.EMAIL_TO }}" >> .env
         echo "USE_LLM=false" >> .env
+        echo "GITHUB_ACTIONS=true" >> .env
+        echo "AUTO_RUN=true" >> .env
+    
+    - name: Show timezone info
+      run: |
+        echo "Current UTC time: $(date -u)"
+        echo "Current Stockholm time: $(TZ=Europe/Stockholm date)"
+        echo "GitHub Actions timezone: $TZ"
+        echo "Environment file created:"
+        cat .env
     
     - name: Run Morning Scanner
       run: |
