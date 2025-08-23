@@ -62,7 +62,7 @@ class SwedishFinancialKeywords:
             "uppåt på börsen", "starkt sentiment", "riskaptit ökar", "stark sektorutveckling", "vinner marknadsandelar", "lyckad pilot",
             "lyckat test", "valideringsdata positiva", "klinisk framgång", "fas 2 lyckas", "fas 3 lyckas", "myndighetsgodkännande",
             "intäktsdelning", "royaltyintäkter", "exklusivitetsperiod", "prisjustering upp", "prishöjning", "stark orderpipeline",
-            "backlog växer", "lönsam tillväxt", "höjer långsiktiga mål"
+            "backlog växer", "lönsam tillväxt", "höjer långsiktiga mål", "delägare", "bekräftat"
         ]
         
         # Catalyst event keywords
