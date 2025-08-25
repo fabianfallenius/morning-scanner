@@ -4,6 +4,7 @@
 import asyncio
 import aiohttp
 import logging
+import os
 import feedparser
 from typing import List, Dict, Any, Optional
 from datetime import datetime
@@ -225,13 +226,16 @@ class ExtraSourcesScraper:
             logger.error(f"Error fetching API content {name}: {e}")
             return []
     
-    async def _fetch_article_content(self, url: str, timeout: int = 10) -> str:
+    async def _fetch_article_content(self, url: str, timeout: int = 5) -> str:
         """Fetch full article content from a URL."""
         try:
             session = await self._create_session()
             logger.debug(f"Fetching article content: {url}")
             
-            async with session.get(url, timeout=timeout) as response:
+            # Use shorter timeout for GitHub Actions compatibility
+            action_timeout = aiohttp.ClientTimeout(total=timeout, connect=timeout)
+            
+            async with session.get(url, timeout=action_timeout) as response:
                 if response.status == 200:
                     content = await response.text()
                     
@@ -309,19 +313,38 @@ class ExtraSourcesScraper:
         """Scrape news from all configured sources."""
         all_news = []
         
+        # Check if running in GitHub Actions
+        is_github_actions = os.environ.get('GITHUB_ACTIONS', 'false').lower() == 'true'
+        
+        if is_github_actions:
+            logger.info("Running in GitHub Actions - using lightweight mode (RSS only)")
+        
         # Fetch from RSS feeds
         for name, url in self.rss_feeds.items():
             try:
                 news_items = await self._fetch_rss_feed(name, url)
                 
-                # Enhance with article content for high-priority feeds
-                if name in ['SVT Ekonomi', 'DN Ekonomi', 'SVT Näringsliv']:
-                    for item in news_items[:5]:  # Limit content fetching to first 5 articles
+                # Enhance with article content for high-priority feeds (only in non-GitHub Actions environment)
+                # Skip content fetching in GitHub Actions to avoid timeouts and failures
+                if (name in ['SVT Ekonomi', 'DN Ekonomi', 'SVT Näringsliv'] and 
+                    not is_github_actions):
+                    for item in news_items[:3]:  # Reduced from 5 to 3 for faster processing
                         if item.get('url'):
-                            article_content = await self._fetch_article_content(item['url'])
-                            if article_content:
-                                item['content'] = article_content
-                                logger.debug(f"Enhanced {name} article with content ({len(article_content)} chars)")
+                            try:
+                                # Only fetch if we don't already have content from RSS
+                                if not item.get('content'):
+                                    article_content = await self._fetch_article_content(item['url'])
+                                    if article_content:
+                                        item['content'] = article_content
+                                        logger.debug(f"Enhanced {name} article with content ({len(article_content)} chars)")
+                            except Exception as e:
+                                logger.debug(f"Failed to fetch content for {name}: {e}")
+                                continue
+                elif is_github_actions:
+                    # In GitHub Actions mode, remove any existing content to ensure lightweight operation
+                    for item in news_items:
+                        if 'content' in item:
+                            del item['content']
                 
                 all_news.extend(news_items)
                 
