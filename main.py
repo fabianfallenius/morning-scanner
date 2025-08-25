@@ -59,7 +59,7 @@ class MorningScanner:
         
         # Initialize news sources
         self.news_sources = [
-            MFNScraper(),
+            # MFNScraper(),  # Temporarily disabled due to website issues (404/500 errors)
             DIMorgonkollScraper(),
             DIMainScraper(),
             ExtraSourcesScraper()
@@ -133,6 +133,22 @@ class MorningScanner:
         except Exception as e:
             self.logger.error(f"Error running Morning Scanner: {str(e)}")
             return False
+        finally:
+            # Clean up sessions
+            await self._cleanup_sessions()
+    
+    async def _cleanup_sessions(self):
+        """Clean up all aiohttp sessions to prevent warnings."""
+        try:
+            for scraper in self.news_sources:
+                if hasattr(scraper, 'close') and callable(getattr(scraper, 'close')):
+                    try:
+                        await scraper.close()
+                    except Exception as e:
+                        self.logger.debug(f"Error closing {scraper.__class__.__name__}: {e}")
+            self.logger.info("All sessions cleaned up")
+        except Exception as e:
+            self.logger.error(f"Error during session cleanup: {e}")
     
     async def _collect_news(self) -> List[Dict]:
         """
@@ -205,20 +221,23 @@ class MorningScanner:
             # Filter for high-relevance news
             high_relevance_news = [
                 item for item in classified_news
-                if item.get('classification', {}).get('relevance_score', 0) >= 0.3
+                if hasattr(item.get('classification'), 'relevance_score') and 
+                   item['classification'].relevance_score >= 0.3
             ]
             
             # Log to storage
             for item in high_relevance_news:
-                self.picks_logger.log_pick(
-                    title=item.get('title', ''),
-                    url=item.get('url', item.get('link', '')),
-                    source=item.get('source', 'Unknown'),
-                    relevance_score=item.get('classification', {}).get('relevance_score', 0),
-                    sentiment_score=item.get('classification', {}).get('sentiment_score', 0),
-                    impact_level=item.get('classification', {}).get('impact_level', 'low'),
-                    has_catalyst=item.get('classification', {}).get('has_catalyst', False)
-                )
+                classification = item.get('classification')
+                if classification:
+                    self.picks_logger.log_pick(
+                        title=item.get('title', ''),
+                        url=item.get('url', item.get('link', '')),
+                        source=item.get('source', 'Unknown'),
+                        relevance_score=getattr(classification, 'relevance_score', 0),
+                        sentiment_score=getattr(classification, 'sentiment_score', 0),
+                        impact_level=getattr(classification, 'impact_level', 'low'),
+                        has_catalyst=getattr(classification, 'has_catalyst', False)
+                    )
             
             self.logger.info(f"Logged {len(high_relevance_news)} high-relevance picks")
             
