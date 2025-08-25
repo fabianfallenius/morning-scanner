@@ -74,12 +74,17 @@ class Config(BaseSettings):
     DEBUG: bool = Field(default=False, description="Enable debug mode")
     DRY_RUN: bool = Field(default=False, description="Enable dry run mode (no actual scraping)")
     
+    # GitHub Actions and automation settings
+    GITHUB_ACTIONS: bool = Field(default=False, description="Running in GitHub Actions environment")
+    AUTO_RUN: bool = Field(default=False, description="Running in automated mode")
+    
     class Config:
         """Pydantic configuration."""
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
         env_prefix = ""  # No prefix for environment variables
+        extra = "allow"  # Allow extra fields from environment
     
     @validator('EMAIL_ENABLED', 'TELEGRAM_ENABLED')
     def validate_notification_config(cls, v, values):
