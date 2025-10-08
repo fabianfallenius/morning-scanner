@@ -36,7 +36,7 @@ jobs:
         echo "TZ=Europe/Stockholm" >> .env
         echo "RUN_HOUR=8" >> .env
         echo "RUN_MINUTE=30" >> .env
-        echo "EMAIL_ENABLED=true" >> .env
+        echo "EMAIL_ENABLED=false" >> .env
         echo "TELEGRAM_ENABLED=false" >> .env
         echo "SMTP_HOST=smtp.gmail.com" >> .env
         echo "SMTP_PORT=587" >> .env
